@@ -9,6 +9,9 @@ import sys
 from datetime import datetime as dt
 import logging
 import tweepy as tw
+import sqlalchemy
+from sqlalchemy.engine import URL
+import pyodbc
 
 sys.path.append(os.getcwd())
 import utils.logs as logs
@@ -23,6 +26,14 @@ PATH_DATAFRAMES = cfg.PATH_DATAFRAMES
 DATE_COL = configs['model']['date_col']
 TARGET_COLS = configs['model']['target_cols']
 PATH_GOOGLE_SERVICE_ACCOUNT = cfg.PATH_GOOGLE_SERVICE_ACCOUNT
+
+def write_df_to_sql_table(df_in, table_name, schema_name, mode='replace'):
+    conn, cursor, conn_str = connect_to_azure_sql_db()
+    connection_url = URL.create("mssql+pyodbc", query={"odbc_connect": conn_str})
+    engine = sqlalchemy.create_engine(connection_url)
+
+    # write the DataFrame to a table in the sql database
+    df_in.to_sql(name=table_name, con=engine, schema=schema_name, if_exists=mode)
 
 
 def connect_to_twitter():
@@ -96,7 +107,7 @@ def connect_to_azure_sql_db():
     conn = pyodbc.connect(conn_str)
     cursor = conn.cursor()
 
-    return conn, cursor
+    return conn, cursor, conn_str
 
 
 # def connect_to_siteground_sql_db():
