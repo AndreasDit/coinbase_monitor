@@ -18,7 +18,7 @@ sys.path.append(os.getcwd())
 import utils.connectivity as conns
 import utils.configs_for_code as cfg
 import utils.logs as logs
-
+import pytz
 
 configs_file = open(cfg.PATH_CONFIG_FILE, 'r')
 configs = yaml.load(configs_file, Loader=yaml.FullLoader)
@@ -27,8 +27,10 @@ logger = logs.create_logger(__name__)
 CB_API_KEY = configs['coinbase']['cb_api_key']
 CB_API_SECRET = configs['coinbase']['cb_api_secret']
 # Get Timestamp for Meta Info
-DT_NOW = dt.now()
-S_NOW = dt.strftime(DT_NOW, '%d-%m-%Y %H:%M:%S')
+
+tz = pytz.timezone('Europe/Berlin')
+dt_now = dt.now(tz)
+S_NOW = dt.strftime(dt_now, '%d-%m-%Y %H:%M:%S')
 
 def get_balance_data(accounts):
     message = []
