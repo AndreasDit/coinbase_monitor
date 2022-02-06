@@ -44,6 +44,7 @@ df_altcoin_transactions_btc = cb.get_transactions_in_btc(df_balance_altcoins, cl
 
 # Get what was paid for in BTC
 df_altcoin_btc_total = df_altcoin_transactions_btc[['wallet_name', 'amount_BTC']].groupby('wallet_name').sum()
+df_altcoin_btc_total = df_altcoin_btc_total.reset_index()
 df_altcoin_btc_total['timestamp'] = S_NOW
 
 # print(df_balance_altcoins)
