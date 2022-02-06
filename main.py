@@ -26,7 +26,7 @@ CB_API_KEY = configs['coinbase']['cb_api_key']
 CB_API_SECRET = configs['coinbase']['cb_api_secret']
 
 client = Client(CB_API_KEY, CB_API_SECRET)
-accounts = client.get_accounts(limit=200)
+accounts = client.get_accounts(limit=300)
 
 # Get balance right now
 df_balance_altcoins = cb.get_balance_data(accounts)
