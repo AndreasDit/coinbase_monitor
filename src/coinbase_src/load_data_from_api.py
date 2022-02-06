@@ -26,6 +26,9 @@ logger = logs.create_logger(__name__)
 
 CB_API_KEY = configs['coinbase']['cb_api_key']
 CB_API_SECRET = configs['coinbase']['cb_api_secret']
+# Get Timestamp for Meta Info
+DT_NOW = dt.now()
+S_NOW = dt.strftime(DT_NOW, '%d-%m-%Y %H:%M:%S')
 
 def get_balance_data(accounts):
     message = []
@@ -66,10 +69,6 @@ def get_rates_in_btc(client):
 
     for rate in rates['rates'].items():
         mikro_faktor = 1000000
-
-        # Get Timestamp for Meta Info
-        dt_now = dt.now()
-        s_now = dt.strftime(dt_now, '%d-%m-%Y %H:%M:%S')
         
         # Coin Name
         str_coin = rate[0]
@@ -79,7 +78,7 @@ def get_rates_in_btc(client):
         coin_price_btc = 1/decimal.Decimal(curr_rate)
         coin_price_mbtc = coin_price_btc*mikro_faktor
         
-        datarow = [str_coin, coin_price_btc, s_now]
+        datarow = [str_coin, coin_price_btc, S_NOW]
         data.append(datarow)
 
     df_rates_ret = pd.DataFrame(data, columns = ['coin_name', 'coin_price_BTC', 'timestamp'])
