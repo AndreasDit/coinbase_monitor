@@ -1,4 +1,5 @@
 import pandas as pd
+from datetime import datetime as dt
 # from coinapi_rest_v1.restapi import CoinAPIv1
 import datetime, sys, os
 import json 
@@ -58,6 +59,34 @@ def get_balance_data(accounts):
     return df_balance_altcoins_ret
 
 
+def get_rates_in_btc(client):
+    data = []
+    rates = client.get_exchange_rates(currency='BTC')
+    # btc_price = decimal.Decimal(client.get_spot_price(currency_pair = 'BTC-EUR')['amount'])
+
+    for rate in rates['rates'].items():
+        mikro_faktor = 1000000
+
+        # Get Timestamp for Meta Info
+        dt_now = dt.now()
+        s_now = dt.strftime(dt_now, '%d-%m-%Y %H:%M:%S')
+        
+        # Coin Name
+        str_coin = rate[0]
+
+        # Rate in BTC instead of EUR
+        curr_rate = rate[1]
+        coin_price_btc = 1/decimal.Decimal(curr_rate)
+        coin_price_mbtc = coin_price_btc*mikro_faktor
+        
+        datarow = [str_coin, coin_price_btc, s_now]
+        data.append(datarow)
+
+    df_rates_ret = pd.DataFrame(data, columns = ['coin_name', 'coin_price_BTC', 'timestamp'])
+
+    return df_rates_ret
+
+
 def get_transactions(wallet_id, wallet_name, client):
     txs = client.get_transactions(wallet_id)
     data = []
@@ -97,7 +126,7 @@ def get_transactions_in_btc(df_balance_altcoins_in, client):
 
         if coin_name == 'BTC':
             df_btc_transactions = get_transactions(account_id, coin_name, client)[['trade_id','amount']].copy()
-            df_btc_transactions['amount_BTC'] = df_btc_transactions['amount']
+            df_btc_transactions['amount_BTC'] = -1 * df_btc_transactions['amount']
             df_btc_transactions = df_btc_transactions.drop('amount', axis=1)
         else:
             df_transactions_tmp = get_transactions(account_id, coin_name, client)
@@ -107,5 +136,6 @@ def get_transactions_in_btc(df_balance_altcoins_in, client):
                 df_altcoin_transactions = pd.concat([df_altcoin_transactions, df_transactions_tmp])
 
     df_altcoin_transactions_btc_ret = pd.merge(df_altcoin_transactions, df_btc_transactions, on=['trade_id'], how='left')
-    
+    df_altcoin_transactions_btc_ret = df_altcoin_transactions_btc_ret.astype({'amount': 'float64', 'amount_BTC': 'float64'})
+
     return df_altcoin_transactions_btc_ret
