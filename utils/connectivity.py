@@ -28,12 +28,20 @@ TARGET_COLS = configs['model']['target_cols']
 PATH_GOOGLE_SERVICE_ACCOUNT = cfg.PATH_GOOGLE_SERVICE_ACCOUNT
 
 def write_df_to_sql_table(df_in, table_name, schema_name, mode='replace'):
-    conn, cursor, conn_str = connect_to_azure_sql_db()
-    connection_url = URL.create("mssql+pyodbc", query={"odbc_connect": conn_str})
-    engine = sqlalchemy.create_engine(connection_url)
+    conn, cursor, engine = connect_to_azure_sql_db()
 
     # write the DataFrame to a table in the sql database
     df_in.to_sql(name=table_name, con=engine, schema=schema_name, if_exists=mode)
+
+
+def read_df_from_sql_table(table_name):
+    conn, cursor, engine = connect_to_azure_sql_db()
+
+    # write the DataFrame to a table in the sql database
+    df_ret = pd.read_sql(sql=table_name, con=engine)
+    
+    return df_ret
+
 
 
 def connect_to_twitter():
@@ -107,7 +115,11 @@ def connect_to_azure_sql_db():
     conn = pyodbc.connect(conn_str)
     cursor = conn.cursor()
 
-    return conn, cursor, conn_str
+    # create engine
+    connection_url = URL.create("mssql+pyodbc", query={"odbc_connect": conn_str})
+    engine = sqlalchemy.create_engine(connection_url)
+
+    return conn, cursor, engine
 
 
 # def connect_to_siteground_sql_db():

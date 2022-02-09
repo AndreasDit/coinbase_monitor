@@ -12,6 +12,9 @@ import utils.logs as logs
 import utils.configs_for_code as cfg
 from coinbase.wallet.client import Client
 from datetime import datetime as dt
+import decimal
+import smtplib, ssl
+
 
 configs_file = open(cfg.PATH_CONFIG_FILE, 'r')
 configs = yaml.load(configs_file, Loader=yaml.FullLoader)
@@ -24,6 +27,9 @@ parser = argparse.ArgumentParser(allow_abbrev=False)
 
 CB_API_KEY = configs['coinbase']['cb_api_key']
 CB_API_SECRET = configs['coinbase']['cb_api_secret']
+MAIL_PASSWORD = configs['coinbase']['mail_password']
+MAIL_ADRESS_SENDER = configs['coinbase']['mail_adress_sender']
+MAIL_ADRESS_RECEIVER = configs['coinbase']['mail_adress_receiver']
 
 client = Client(CB_API_KEY, CB_API_SECRET)
 accounts = client.get_accounts(limit=300)
@@ -58,3 +64,25 @@ connect.write_df_to_sql_table(df_rates, 'coin_rates', 'coinbase', 'append')
 connect.write_df_to_sql_table(df_balance_altcoins_btc, 'balance_altcoins_btc', 'coinbase', 'append')
 connect.write_df_to_sql_table(df_altcoin_btc_total, 'altcoin_btc_total', 'coinbase')
 
+# Load data to perform analysis
+df_auswertung = connect.read_df_from_sql_table('select * from coinbase.v_balance_auswertung')
+
+# Preparre to send mails
+port = 465  # For SSL
+context = ssl.create_default_context()
+
+# Perform Analysis
+for idx, row in df_auswertung.iterrows():
+    coin_name = row['coin_name']
+    str_rel_proz_profit = row['rel_proz_profit']
+    rel_proz_profit = decimal.Decimal(str_rel_proz_profit)
+    
+    if rel_proz_profit > 10.0:
+        with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
+            server.login(MAIL_ADRESS_SENDER, MAIL_PASSWORD)
+            message = f"""\
+            Subject: Notifier. coin {coin_name} is at {rel_proz_profit}%
+
+            Notifier - coin {coin_name} is at {rel_proz_profit}%."""
+            server.sendmail(MAIL_ADRESS_SENDER, MAIL_ADRESS_RECEIVER, message)
+    # print(f"The coin {coin_name} has a rel. proz. profit of {str_rel_proz_profit}.")
