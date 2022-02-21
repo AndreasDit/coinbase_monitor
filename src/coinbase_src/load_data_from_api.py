@@ -92,7 +92,6 @@ def get_transactions(wallet_id, wallet_name, client):
     txs = client.get_transactions(wallet_id)
     data = []
     for transaction in txs.data:
-#         print(transaction)
 
         trade_type = transaction['type']
         created_at = transaction['created_at']
@@ -135,6 +134,9 @@ def get_transactions_in_btc(df_balance_altcoins_in, client):
                 df_altcoin_transactions = df_transactions_tmp
             else:
                 df_altcoin_transactions = pd.concat([df_altcoin_transactions, df_transactions_tmp])
+                
+    # correction for first order missing in the wallet
+    df_btc_transactions.loc[-1] = ['57bb1ac3-e523-5b15-a55e-67d5373c6916', -0.000596]
 
     df_altcoin_transactions_btc_ret = pd.merge(df_altcoin_transactions, df_btc_transactions, on=['trade_id'], how='left')
     df_altcoin_transactions_btc_ret = df_altcoin_transactions_btc_ret.astype({'amount': 'float64', 'amount_BTC': 'float64'})
