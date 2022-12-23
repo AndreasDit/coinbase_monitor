@@ -1,6 +1,13 @@
 # coinbase monitor
 This Package creates the data basis for my Altcoin Monitor on Coinbase.
 
+# Setup and install ODBC Driver for Microsoft SQL Server 17
+Install here: https://learn.microsoft.com/th-th/sql/connect/odbc/linux-mac/install-microsoft-odbc-driver-sql-server-macos?view=sql-server-2017
+
+Perform following commands:
+sudo ln -s /opt/homebrew/etc/odbcinst.ini /etc/odbcinst.ini
+sudo ln -s /opt/homebrew/etc/odbc.ini /etc/odbc.ini
+
 ## Hosting services
 
 Services I tried:
