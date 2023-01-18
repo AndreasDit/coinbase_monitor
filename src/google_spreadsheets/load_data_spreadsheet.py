@@ -73,7 +73,7 @@ def main(credentials=None):
     logger.info("Start main()")
 
     # open connections
-    conn_azure, cursor_azure = conns.connect_to_azure_sql_db()
+    conn_azure, cursor_azure, engine = conns.connect_to_azure_sql_db()
     if credentials:
         conn_google = conns.connect_to_google_spreadsheets(auth_type='env', credentials=credentials)
     else:
