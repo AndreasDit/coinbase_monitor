@@ -12,6 +12,8 @@ import tweepy as tw
 import sqlalchemy
 from sqlalchemy.engine import URL
 import pyodbc
+import smtplib, ssl
+
 
 sys.path.append(os.getcwd())
 import utils.logs as logs
@@ -145,6 +147,16 @@ def connect_to_azure_sql_db():
 
 #     return conn, cursor
 
+
+def send_mail(mail_adr_sender, sender_pw, mail_adr_redeiver, message):
+    # Preparre to send mails
+    port = 465  # For SSL
+    context = ssl.create_default_context()
+
+    with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
+        server.login(mail_adr_sender, sender_pw)
+        server.sendmail(mail_adr_sender, mail_adr_redeiver, message)
+    
 
 def connect_to_google_spreadsheets(auth_type='file', credentials=None):
     """
