@@ -79,9 +79,9 @@ def main(credentials=None):
 
     # define SQL statements
     sql_stmts = []
-    sql_stmt = """select * from sonntagsfrage.hate_twittert_tweets_compressed"""
+    sql_stmt = """select * from coinbase.v_total_balance_mbtc"""
     sql_stmts.append(sql_stmt)
-    sql_stmt = """select * from sonntagsfrage.data_for_corr"""
+    sql_stmt = """select * from coinbase.v_balance_auswertung"""
     sql_stmts.append(sql_stmt)
 
     for idx, spreadsheet in enumerate(LIST_SPREADSHEET_NAMES):
