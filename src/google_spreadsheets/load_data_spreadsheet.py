@@ -5,6 +5,7 @@ import sys
 import pandas as pd
 
 sys.path.append(os.getcwd())
+sys.path.append('.')
 import utils.connectivity as conns
 import utils.configs_for_code as cfg
 import utils.logs as logs
