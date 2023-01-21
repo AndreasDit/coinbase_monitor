@@ -59,7 +59,8 @@ def fill_worksheet_from_df(worksheet, df_input):
 
     # fill worksheet with data lines
     data_rows = []
-    for idx in range(2, len(df_input)):  # counting starts at 1 not at 0
+    
+    for idx in range(0, len(df_input)):  # counting starts at 1 not at 0
         pd_row = df_input.iloc[idx]
         row = pd_row.tolist()
         data_rows.append(row)
