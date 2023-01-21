@@ -81,9 +81,9 @@ def main(credentials=None):
 
     # define SQL statements
     sql_stmts = []
-    sql_stmt = """select * from coinbase.v_total_balance_mbtc"""
+    sql_stmt = """select * from data_exit.v_coinbase_total_balance_mbtc"""
     sql_stmts.append(sql_stmt)
-    sql_stmt = """select * from coinbase.v_balance_auswertung"""
+    sql_stmt = """select * from data_exit.v_coinbase_balance_auswertung"""
     sql_stmts.append(sql_stmt)
 
     for idx, spreadsheet in enumerate(LIST_SPREADSHEET_NAMES):
