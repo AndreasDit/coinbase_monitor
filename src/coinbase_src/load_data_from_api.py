@@ -63,6 +63,24 @@ def get_balance_data(accounts):
     df_balance_altcoins_ret = pd.DataFrame(data, columns = ['coin_name', 'native_balance_EUR', 'balance_amount', 'account_id', 'ts_last_change'])
     return df_balance_altcoins_ret
 
+def clean_coin_transactions(df_in, tsidx_colname_ine):
+    df_tmp = df_in.copy()
+    
+    # set index
+    df_in_tsidx = df_in.set_index(tsidx_colname_ine)
+    df_tmp_tsidx = df_tmp.set_index(tsidx_colname_ine)
+    
+    # clean transactions from old zero sums. Assumption here: when sold, then everything is sold at once
+    for index, row in df_in_tsidx.iterrows():
+        if row.amount < 0:
+            ts = row.name
+            df_tmp_tsidx = df_tmp_tsidx[df_tmp_tsidx.index > ts]
+
+    # delete index for output
+    df_tmp = df_tmp_tsidx.reset_index()
+    
+    df_out = df_tmp
+    return df_out
 
 def get_rates_in_btc(client):
     data = []
@@ -130,6 +148,7 @@ def get_transactions_in_btc(df_balance_altcoins_in, client):
             df_btc_transactions = df_btc_transactions.drop('amount', axis=1)
         else:
             df_transactions_tmp = get_transactions(account_id, coin_name, client)
+            df_transactions_tmp = clean_coin_transactions(df_transactions_tmp, 'created_at')
             if df_altcoin_transactions is None:
                 df_altcoin_transactions = df_transactions_tmp
             else:
